@@ -1,0 +1,4 @@
+#Requires AutoHotkey v2.0
+
+; Når scriptet startes, vises denne beskedboks:
+MsgBox("worked")

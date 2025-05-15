@@ -1,8 +1,3 @@
-;;#Requires AutoHotkey v2.0
-
-;; Når scriptet startes, vises denne beskedboks:
-;;MsgBox("worked")
-
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 SetWorkingDir A_ScriptDir

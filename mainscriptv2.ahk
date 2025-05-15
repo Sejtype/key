@@ -4,6 +4,13 @@ SetWorkingDir A_ScriptDir
 SetTitleMatchMode 2
 CoordMode "Mouse", "Screen"
 
+configFile := A_Temp "\\config.ini"
+
+if !FileExist(configFile) {
+    MsgBox "Config file not found!"
+    ExitApp
+}
+
 ; Load saved coordinates if file exists
 configFile := "autosell_coordinates.ini"
 if FileExist(configFile) {

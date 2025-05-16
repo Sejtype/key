@@ -54,10 +54,16 @@ ShowIntro() {
     introGui.SetFont("s10", "Segoe UI")
     introGui.AddText("cBlue", "Made by: sejtype")
     introGui.AddText("cDefault", "Macro Description:")
-    introGui.AddText("", "Walks to dock (D), fishes 19min, returns (A), sells, repeats")
-    introGui.AddText("", "\nControls:")
+    introGui.AddText("", "Spam Sells on 6 instances every 5-7 minutes!")
+    introGui.AddText("", "Controls:")
     introGui.AddText("cGreen", hotkeyStart " - Start Macro")
     introGui.AddText("cRed",   hotkeyExit " - Exit")
+    introGui.AddText("cBlue",   hotkeySetWindow1 " - Window 1 Hotkey")
+    introGui.AddText("cBlue",   hotkeySetWindow2 " - Window 2 Hotkey")
+    introGui.AddText("cBlue",   hotkeySetWindow3 " - Window 3 Hotkey")
+    introGui.AddText("cBlue",   hotkeySetWindow4 " - Window 4 Hotkey")    
+    introGui.AddText("cBlue",   hotkeySetWindow5 " - Window 5 Hotkey")
+    introGui.AddText("cBlue",   hotkeySetWindow6 " - Window 6 Hotkey")
     introGui.AddButton("w150 Default", "Understand").OnEvent("Click", (*) => (
         introGui.Destroy(),
         BindHotkeys()

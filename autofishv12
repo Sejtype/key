@@ -19,10 +19,13 @@ hotkeySetWindow6 := "F10"
 
 ; Unified config file path
 configFile := A_ScriptDir "\autosell_coordinates.ini"
+
 if !FileExist(configFile) {
-    MsgBox "Config file not found!"
-    ExitApp
+    ; Create the file with default section and key (if desired)
+    FileAppend "[Coordinates]`nX=0`nY=0`n", configFile
+    MsgBox "Config file was missing and has been created."
 }
+
 
 windowX1 := IniRead(configFile, "Coords", "windowX1", 0)
 windowY1 := IniRead(configFile, "Coords", "windowY1", 0)

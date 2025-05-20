@@ -3,31 +3,150 @@
 SetWorkingDir A_ScriptDir
 CoordMode "Mouse", "Screen"
 
-macroRunning := false
+; === Global state
+macroRunning := 0
 chosenSide := ""
+currentName := ""
 
-; Default coordinates (2560x1440)
-farmBtn     := [1472, 83]
-eggsBtn     := [986, 83]
-sellBtn     := [0, 0] ; HUSK
-btn1        := [850, 571]
-btn2        := [1520, 564]
-btn3        := [848, 936]
-claimBtn    := [1281, 969]
-sellpetsBtn := [0, 0] ; HUSK
-middleshopGUI := [1281, 671]
-plantBtn    := [0, 0] ; HUSK
+defaultCoords := Map(
+    "FarmBtn",       [1472, 83],
+    "EggsBtn",       [986, 83],
+    "Sellbtn",       [1876, 88],
+    "Btn1",          [850, 571],
+    "Btn2",          [1520, 564],
+    "Btn3",          [848, 936],
+    "Claimbtn",      [1281, 969],
+    "sellpetsbtn",   [1231, 953],
+    "MiddleshopGUI", [1281, 671],
+    "plantbtn",      [1276, 796],
+    "closepetsbtn",  [1953, 347]
+)
 
-; Hotkeys
-Hotkey "F3", StartMacro
-Hotkey "F4", (*) => ExitApp()
+; === INI loading
+iniFile := A_ScriptDir "\AutoGrowPets.ini"
+coords := Map()
+tabsList := Map(
+    1, ["FarmBtn"],
+    2, ["EggsBtn", "Btn1", "Btn2", "Btn3", "MiddleshopGUI"],
+    3, ["Sellbtn", "sellpetsbtn"],
+    4, ["Claimbtn", "plantbtn", "closepetsbtn"]
+)
+
+; Fill coords from INI or fallback to defaults
+for _, names in tabsList {
+    for name in names {
+        section := RegExReplace(name, "(Btn|btn).*")
+        x := IniRead(iniFile, section, name "_X", "")
+        y := IniRead(iniFile, section, name "_Y", "")
+        if (x = "" or y = "")
+            coords[name] := defaultCoords.Has(name) ? defaultCoords[name] : [0, 0]
+        else
+            coords[name] := [x + 0, y + 0]
+    }
+}
+
+; === Assign coords to variables used in macro ===
+farmBtn       := coords.Has("FarmBtn")       ? coords["FarmBtn"]       : defaultCoords["FarmBtn"]
+eggsBtn       := coords.Has("EggsBtn")       ? coords["EggsBtn"]       : defaultCoords["EggsBtn"]
+sellBtn       := coords.Has("Sellbtn")       ? coords["Sellbtn"]       : defaultCoords["Sellbtn"]
+btn1          := coords.Has("Btn1")          ? coords["Btn1"]          : defaultCoords["Btn1"]
+btn2          := coords.Has("Btn2")          ? coords["Btn2"]          : defaultCoords["Btn2"]
+btn3          := coords.Has("Btn3")          ? coords["Btn3"]          : defaultCoords["Btn3"]
+claimBtn      := coords.Has("Claimbtn")      ? coords["Claimbtn"]      : defaultCoords["Claimbtn"]
+sellpetsBtn   := coords.Has("sellpetsbtn")   ? coords["sellpetsbtn"]   : defaultCoords["sellpetsbtn"]
+middleshopGUI := coords.Has("MiddleshopGUI") ? coords["MiddleshopGUI"] : defaultCoords["MiddleshopGUI"]
+plantBtn      := coords.Has("plantbtn")      ? coords["plantbtn"]      : defaultCoords["plantbtn"]
+closepetsBtn  := coords.Has("closepetsbtn")  ? coords["closepetsbtn"]  : defaultCoords["closepetsbtn"]
+
+
+
+; === GUI setup
+MainUI := Gui()
+MainUI.Opt("+Caption -SysMenu +AlwaysOnTop")
+MainUI.SetFont("s12 q5 w600", "Segoe UI")
+TabsCtl := MainUI.AddTab3("", ["Farm", "Eggs", "Sell", "Storage && Plant"])
+
+SetPos(name, *) {
+    global currentName
+    currentName := name
+    ToolTip "Click anywhere to set position for: " name
+    Hotkey("~LButton", SaveClickPos, "On")
+}
+
+SaveClickPos(*) {
+    global currentName, coords, MainUI
+    ToolTip
+    Hotkey("~LButton", "Off")
+    MouseGetPos &x, &y
+    coords[currentName] := [x, y]
+    MainUI[currentName "XPos"].Value := x
+    MainUI[currentName "YPos"].Value := y
+    ToolTip "Saved!"
+    SetTimer () => ToolTip(), -1000
+}
+
+SaveValues() {
+    global coords, iniFile
+    for name, xy in coords {
+        section := RegExReplace(name, "(Btn|btn).*")
+        IniWrite(xy[1], iniFile, section, name "_X")
+        IniWrite(xy[2], iniFile, section, name "_Y")
+    }
+    ToolTip "All positions saved!"
+    SetTimer () => ToolTip(), -1000
+}
+
+AddPosField(name) {
+    global MainUI, coords
+    xy := coords.Get(name, [0, 0])
+
+    MainUI.Add("Text", "Section xs yp+30", name)
+    MainUI.Add("Button", "w25 h25 x220 ys", "S")
+        .OnEvent("Click", SetPos.Bind(name))
+
+    xEdit := MainUI.Add("Edit", "ys w60 x250 v" name "XPos")
+    MainUI.Add("UpDown", "Range1-5000")
+    xEdit.Value := xy[1]
+
+    yEdit := MainUI.Add("Edit", "ys w60 x320 v" name "YPos")
+    MainUI.Add("UpDown", "Range1-5000")
+    yEdit.Value := xy[2]
+}
+
+AddFooterControls() {
+    global MainUI
+    MainUI.Add("Button", "xm y+20 w80", "Save").OnEvent("Click", (*) => SaveValues())
+    MainUI.Add("Button", "x+10 w80", "Close").OnEvent("Click", (*) => MainUI.Hide())
+    MainUI.Add("Text", "xm y+20 cGray", "Made by sejtype")
+    MainUI.Add("Text", "xm y+20 cBlue", "discord.gg/K4gkrcEcFn").OnEvent("Click", (*) => Run("https://discord.gg/K4gkrcEcFn"))
+
+}
+
+; === Tabs
+for tabIndex, label in ["Farm", "Eggs", "Sell", "Storage && Plant"]
+{
+    TabsCtl.UseTab(tabIndex)
+    MainUI.SetFont("s14 q5 w700", "Constantia")
+    MainUI.Add("Text", "Section", label)
+    MainUI.SetFont("s12 q5 w500", "Segoe UI")
+    for name in tabsList[tabIndex]
+        AddPosField(name)
+    AddFooterControls()
+}
+
+; === Hotkeys
+Hotkey("F3", (*) => StartMacro())
+Hotkey("F4", (*) => ExitApp())
+
+MainUI.Show()
+Return
+
 
 StartMacro(*) {
     global macroRunning, chosenSide
     if macroRunning
         return
 
-    ; Depends what side you're on
     answer := MsgBox("Choose your side:`nYes = Right (Presses D)`nNo = Left (Presses A)", "Side Selection", 0x33)
     if answer = "Yes"
         chosenSide := "right"
@@ -41,7 +160,6 @@ StartMacro(*) {
     DoTasks()
 }
 
-; Reliable clicking method
 ReliableClick(x, y) {
     randX := x + Random(-5, 5)
     randY := y + Random(-5, 5)
@@ -55,25 +173,21 @@ PlantingClick(x, y) {
 }
 
 DoTasks() {
-    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI, plantBtn
-    
-    Loop 120 { ; Sets the camera straight
-    ;Loop 2 {  ; For debuggning
+    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI, plantBtn, closepetsBtn
+
+    Loop 120 {
         ReliableClick(farmBtn*)
         Sleep 90
     }
-
     Sleep 5000
 
-;;;; Sell Function
-    Loop 5 { ; Teleports to sgop
+    Loop 5 {
         ReliableClick(sellBtn*)
         Sleep 90
     }
-    
     Sleep 1000
 
-    if chosenSide = "right" { ; Side chosen
+    if chosenSide = "right" { ; Depends if your on what side
         Send "{d down}"
         Sleep 400
         Send "{d up}"
@@ -83,19 +197,15 @@ DoTasks() {
         Send "{a up}"
     }
 
+    MouseMove(sellpetsBtn*)
     Sleep 1000
-
-    ReliableClick(sellpetsBtn*) ; Sells pets
-
+    ReliableClick(sellpetsBtn*)
     Sleep 5000
 
-
-;;;; Egg Buy
-    Loop 5 { ; Goes to egg shop
+    Loop 5 {
         ReliableClick(eggsBtn*)
         Sleep 90
     }
-    
     Sleep 1000
 
     if chosenSide = "right" { ; Depends if your on what side
@@ -109,20 +219,17 @@ DoTasks() {
     }
 
     Sleep 1000
-
-    ;ReliableClick(middleshop*)
-    MouseMove(middleshopGUI*) ; Moves mouse to GUI center
+    MouseMove(middleshopGUI*)
     ReliableClick(middleshopGUI*)
-    
+
     Loop 15 {
         Sleep 250
-        Send "{WheelDown}" ; Scrolls down
+        Send "{WheelDown}"
         Sleep 250
     }
-
     Sleep 1000
 
-    Loop 10 { ; buys three bottom pets
+    Loop 10 {
         ReliableClick(btn1*)
         Sleep 250
         ReliableClick(btn2*)
@@ -130,16 +237,15 @@ DoTasks() {
         ReliableClick(btn3*)
         Sleep 250
     }
-
     Sleep 5000
 
-;;;; Claim Function
-    Loop 30 { ; Goes to farm, makes sure the cam is right pos
+    Loop 30 {
         ReliableClick(farmBtn*)
         Sleep 90
     }
     Sleep 5000
-    MouseMove(claimBtn*) ; Moves to claiming button
+
+    MouseMove(claimBtn*)
     Send "{s down}"
     Sleep 3000
     Send "{s up}"
@@ -147,86 +253,31 @@ DoTasks() {
     ReliableClick(claimBtn*)
     Sleep 5000
 
-;;;; Plants eggs in hotbar
-    Loop 5 { ; Goes to farm, makes sure the cam is right pos
+    Loop 5 {
         ReliableClick(farmBtn*)
         Sleep 90
     }
 
+    Loop 20 {
+        PlantingClick(plantBtn*)
+           sleep 90
+        }
+
+    Loop 3 {
+            MouseMove(closepetsBtn*)
+            Sleep 100
+            ReliableClick(closepetsBtn*)
+        }
+
     Send "{s down}"
-    Sleep 100
+    Sleep 200
     Send "{s up}"
-    
-    Send "{1 down}"
-    Sleep 50
-    Send "{1 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
 
-    Send "{2 down}"
-    Sleep 50
-    Send "{2 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
+    Loop 250 {
+        Send "{e down}"
+        Sleep 100
+        Send "{e up}"
+        MouseMove(closepetsBtn*)
+        ReliableClick(closepetsBtn*)
     }
-
-    Send "{3 down}"
-    Sleep 50
-    Send "{3 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-
-    Send "{4 down}"
-    Sleep 50
-    Send "{4 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-
-    Send "{5 down}"
-    Sleep 50
-    Send "{5 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-    
-    Send "{6 down}"
-    Sleep 50
-    Send "{6 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-
-    Send "{7 down}"
-    Sleep 50
-    Send "{7 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-
-    Send "{8 down}"
-    Sleep 50
-    Send "{8 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-
-    Send "{9 down}"
-    Sleep 50
-    Send "{9 up}"
-    Loop 20 { 
-        PlantingClick(plantBtn*)
-        Sleep 90
-    }
-
 }

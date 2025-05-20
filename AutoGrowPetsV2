@@ -175,7 +175,7 @@ PlantingClick(x, y) {
 DoTasks() {
     global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI, plantBtn, closepetsBtn
 
-    Loop 120 {
+    Loop 165 {
         ReliableClick(farmBtn*)
         Sleep 90
     }
@@ -239,7 +239,7 @@ DoTasks() {
     }
     Sleep 5000
 
-    Loop 30 {
+    Loop 60 {
         ReliableClick(farmBtn*)
         Sleep 90
     }

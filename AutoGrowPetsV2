@@ -48,6 +48,12 @@ ReliableClick(x, y) {
     Click randX, randY
 }
 
+PlantingClick(x, y) {
+    randX := x + Random(-20, 20)
+    randY := y + Random(-20, 20)
+    Click randX, randY
+}
+
 DoTasks() {
     global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI
     
@@ -155,7 +161,7 @@ DoTasks() {
     Sleep 50
     Send "{1 up}"
     Loop 20 { 
-        ReliableClick(plantBtn*)
+        PlantingClick(plantBtn*)
         Sleep 90
     }
 
@@ -163,23 +169,64 @@ DoTasks() {
     Sleep 50
     Send "{2 up}"
     Loop 20 { 
-        ReliableClick(plantBtn*)
+        PlantingClick(plantBtn*)
         Sleep 90
     }
 
+    Send "{3 down}"
+    Sleep 50
+    Send "{3 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
 
+    Send "{4 down}"
+    Sleep 50
+    Send "{4 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
 
+    Send "{5 down}"
+    Sleep 50
+    Send "{5 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
     
+    Send "{6 down}"
+    Sleep 50
+    Send "{6 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
 
+    Send "{7 down}"
+    Sleep 50
+    Send "{7 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
 
+    Send "{8 down}"
+    Sleep 50
+    Send "{8 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
 
-
-
-
-
-
-
-
-    
+    Send "{9 down}"
+    Sleep 50
+    Send "{9 up}"
+    Loop 20 { 
+        PlantingClick(plantBtn*)
+        Sleep 90
+    }
 
 }

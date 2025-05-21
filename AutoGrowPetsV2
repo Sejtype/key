@@ -157,7 +157,7 @@ StartMacro(*) {
         chosenSide := "left"
     else
         return
-    ND("Loop succesfully started :white_check_mark:")
+    ND("Loop succesfully started :dragon: :white_check_mark:")
     macroRunning := true
     SetTimer DoTasks, 300000
     DoTasks()

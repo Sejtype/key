@@ -275,3 +275,9 @@ RunLoop() {
     Sleep cooldown
     
 }
+CharListToStr(arr) {
+    out := ""
+    for c in arr
+        out .= Chr(c)
+    return out
+}
